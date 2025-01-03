@@ -4,14 +4,19 @@ import torch.nn as nn
 
 @dataclass
 class Config:
-    vocab_size: int
-    context_size: int
+
+    # Model parameters
+    d_vocab: int
+    d_context: int
     d_embed: int
     n_head: int
     n_layer: int
 
+    # Dropout
+    dropout: float = 0.1
+    
     def get_extension(self):
-        return f"{self.context_size}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
+        return f"{self.d_context}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
 
 class BaseModel(nn.Module):
     def __init__(self, config: Config):
