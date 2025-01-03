@@ -1,7 +1,7 @@
 import re
 import os
-from tokenizer_util import generate_bpe_files
 import tiktoken
+from tokenizers import ByteLevelBPETokenizer
 
 NUM_RESERVED_TOKENS = 100
 BASE_TOKENIZER_PATH = '../../models/tokenizers'
@@ -10,9 +10,11 @@ class Tokenzier:
 
     pat_str = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"  # Taken from Llama 3, helps maintain contractions, small numbers, etc.
 
-    def __init__(self, file_path):
+    def __init__(self, name):
 
-        assert os.path.isfile(file_path), f'Vocab file {file_path} could not be found'
+        file_path = f'{BASE_TOKENIZER_PATH}/{name}'
+
+        assert os.path.exists(file_path), f'Vocab file {file_path} could not be found'
 
         mergeable_ranks = tiktoken.load_tiktoken_bpe(file_path)
         num_base_tokens = len(mergeable_ranks)
@@ -45,6 +47,16 @@ class Tokenzier:
                 continue 
             token = token.replace('<|', '').replace('|>', '')
             setattr(self, f'{token}_id', token_id)
+    
+    @staticmethod
+    def generate_bpe_files(corpus_iterator, vocab_size, name):
+        output_dir = os.path.join(BASE_TOKENIZER_PATH, name)
+        assert not os.path.exists(output_dir), f'Failed to generate BPE files: Tokenizer named "{name}" already exists'
+        os.makedirs(output_dir)
+        bpe_tokenizer = ByteLevelBPETokenizer() # Tiktoken doesn't have a generation method, so we have to use the tokenizers library
+        bpe_tokenizer.train_from_iterator(corpus_iterator, vocab_size)
+        bpe_tokenizer.save_model(output_dir)
+        os.rename(os.path.join(output_dir, 'vocab.json'), os.path.join(output_dir, 'vocab.bpe'))
 
     def encode(self, text, add_bot=False, add_eot=False):
         enc = self.tokenizer.encode(text)
@@ -56,3 +68,4 @@ class Tokenzier:
 
     def decode(self, enc):
         return self.tokenizer.decode(enc)
+    
