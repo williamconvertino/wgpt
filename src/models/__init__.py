@@ -1,0 +1,1 @@
+from src.models import Config, BaseModel
