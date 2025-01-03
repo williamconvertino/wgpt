@@ -12,11 +12,12 @@ class Tokenzier:
 
     def __init__(self, name):
 
-        file_path = f'{BASE_TOKENIZER_PATH}/{name}'
+        self.name = name
+        self.file_path = f'{BASE_TOKENIZER_PATH}/{name}'
 
-        assert os.path.exists(file_path), f'Vocab file {file_path} could not be found'
+        assert os.path.exists(self.file_path), f'Vocab file {self.file_path} could not be found'
 
-        mergeable_ranks = tiktoken.load_tiktoken_bpe(file_path)
+        mergeable_ranks = tiktoken.load_tiktoken_bpe(self.file_path)
         num_base_tokens = len(mergeable_ranks)
 
         special_tokens = [
@@ -40,6 +41,8 @@ class Tokenzier:
             mergeable_ranks=mergeable_ranks,
             special_tokens=self.special_tokens
         )
+
+        self.d_vocab = len(self.tokenizer)
 
         # Set special token IDs as attributes
         for token, token_id in self.special_tokens.items():
