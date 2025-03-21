@@ -1,2 +1,7 @@
+torch
+torchtune
+torchao
+pytorch-lightning
+datasets
 tiktoken
-tokenizers
+python-dotenv
