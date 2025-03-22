@@ -159,7 +159,7 @@ Generates a `.bin` file by iterating over `data` (a huggingface dataset), tokeni
 The `PDBSampler` class (which means Proportional Distributed Batch Sampler) acts as a pytorch distributed sampler with additional proportional batch compatibility. It makes sure that every batch contains exclusively samples from a single dataset, with the dataset chosen at random with a probability based on its relative size (while staying PyTorch Lightning DDP compatible).
 
 ```
-class PDBSampler(Dataset):
+class PDBSampler(Sampler):
     def __init__(self, datasets, batch_size, world_size, rank, shuffle=True, proportional_sampling=True):
 ```
 
@@ -172,7 +172,7 @@ def __len__(self):
 ```
 
 ```
-def __getitem__(self):
+def __iter__(self):
 ```
 
 ### process.py
