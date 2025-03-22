@@ -17,16 +17,10 @@ def process_dataset():
     tokenizer = Tokenizer()
 
     for split in ["train", "validation", "test"]:
-        dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, streaming=True)
-        total_samples = dataset.info.splits[split].num_examples
         
-        def text_generator():
-            for sample in dataset:
-                text = sample.get("text", "").strip()
-                if text:
-                    yield text
+        dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, cache_dir="./datasets")
         
-        DiskDataset.generate_bin("slim-pajama", split, text_generator(), tokenizer, total_samples=total_samples)
+        DiskDataset.generate_bin("slim-pajama", split, dataset, tokenizer)
 
 if __name__ == "__main__":
     process_dataset()

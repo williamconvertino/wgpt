@@ -61,7 +61,7 @@ class DiskDataset(Dataset):
         return torch.tensor(sample, dtype=torch.long)
     
     @staticmethod
-    def generate_bin(dataset_name, split, data, tokenizer, use_eos=True, batch_size=1000, total_samples=None):
+    def generate_bin(dataset_name, split, data, tokenizer, use_eos=True, batch_size=1000):
         """
         Generates a binary file for a given dataset split.
         It tokenizes the samples from the provided HuggingFace dataset
@@ -80,8 +80,7 @@ class DiskDataset(Dataset):
 
         batch = []
         
-        if total_samples is None:
-            total_samples = sum(1 for _ in data)
+        total_samples = len(data)
         
         for i, sample in tqdm(enumerate(data), total=total_samples, desc=f"Tokenizing {split} data"):
             batch.append(sample)
