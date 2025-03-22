@@ -1,9 +1,12 @@
 import os
 import yaml
 import importlib
+from data.tokenizer import Tokenizer
 
 BASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'configs')
 DEFAULT_PATH = os.path.join(BASE_PATH, 'default.yml')
+
+DEFAULT_VOCAB_SIZE = 50257 + 3  # 50257 tokens + 3 special tokens
 
 def merge_dicts(main_dict, default_dict):
     result = default_dict.copy()
@@ -14,7 +17,7 @@ def merge_dicts(main_dict, default_dict):
             result[key] = value
     return result
 
-def load_config(name):
+def load_config(name, vocab_size=DEFAULT_VOCAB_SIZE):
     """
     Loads a config file from 'configs/{name}.yml', fills in missing values 
     from 'configs/default.yml', and returns the merged configuration as a dict.
@@ -26,6 +29,8 @@ def load_config(name):
 
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
+        
+    config.model.vocab_size = vocab_size
 
     return merge_dicts(config, default)
 
@@ -58,6 +63,6 @@ def load_model_from_config(config):
     if model_class is None:
         raise AttributeError(f"Could not find model class in module '{model_type}'.")    
 
-    model = model_class(config)
+    model = model_class(config.model)
     model.config = config
     return model
