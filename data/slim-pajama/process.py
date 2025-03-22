@@ -19,7 +19,7 @@ def process_dataset():
 
     if not os.path.exists('/raw'):
         os.makedirs('/raw', exist_ok=True)
-        dataset = load_dataset("DKYoon/SlimPajama-6B", split=split)
+        dataset = load_dataset("DKYoon/SlimPajama-6B")
         dataset.save_to_disk('/raw')
         del dataset    
 
