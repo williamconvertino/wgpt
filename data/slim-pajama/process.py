@@ -6,6 +6,9 @@ from datasets import load_dataset
 from data.diskdataset import DiskDataset
 from data.tokenizer import Tokenizer
 
+RAW_PATH = './raw'
+HF_PATH = 'DKYoon/SlimPajama-6B'
+
 def process_dataset():
     """
     Downloads, processes, tokenizes, and saves the SlimPajama dataset using streaming,
@@ -17,15 +20,15 @@ def process_dataset():
     
     tokenizer = Tokenizer()
 
-    if not os.path.exists('./raw'):
-        os.makedirs('./raw', exist_ok=True)
-        dataset = load_dataset("DKYoon/SlimPajama-6B")
-        dataset.save_to_disk('/raw')
+    if not os.path.exists(RAW_PATH):
+        os.makedirs(RAW_PATH, exist_ok=True)
+        dataset = load_dataset(HF_PATH)
+        dataset.save_to_disk(RAW_PATH)
         del dataset    
 
     for split in ["train", "validation", "test"]:
             
-        dataset = load_dataset("./raw/DKYoon___slim_pajama-6_b", split=split, streaming=True)
+        dataset = load_dataset(f"{RAW_PATH}/DKYoon___slim_pajama-6_b", split=split, streaming=True)
         
         DiskDataset.generate_bin("slim-pajama", split, dataset['text'], tokenizer)
 
