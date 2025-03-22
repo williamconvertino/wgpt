@@ -28,7 +28,7 @@ def process_dataset():
 
     for split in ["train", "validation", "test"]:
             
-        dataset = load_dataset(f"{RAW_PATH}/DKYoon___slim_pajama-6_b", split=split, streaming=True)
+        dataset = load_dataset(RAW_PATH, split=split, streaming=True)
         
         DiskDataset.generate_bin("slim-pajama", split, dataset['text'], tokenizer)
 
