@@ -18,7 +18,7 @@ def process_dataset():
 
     for split in ["train", "validation", "test"]:
         
-        dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, cache_dir="./datasets")
+        dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, cache_dir="./raw")
         
         DiskDataset.generate_bin("slim-pajama", split, dataset, tokenizer)
 
