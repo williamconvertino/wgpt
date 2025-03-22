@@ -35,7 +35,8 @@ def process_dataset():
     for split in ["train", "validation", "test"]:
         
         dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, streaming=True, download_config=download_config)
-        length = get_dataset_config_info("DKYoon/SlimPajama-6B")["splits"][split]["num_examples"]
+        length = get_dataset_config_info("DKYoon/SlimPajama-6B")
+        print(f"Length: {length}")
         generator = DataGenerator(dataset, length)
     
         print(f"Processing {split} split...")
