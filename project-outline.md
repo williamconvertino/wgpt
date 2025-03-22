@@ -268,6 +268,8 @@ class ModelLightningWrapper(pl.LightningModule):
     def __init__(self, model, learning_rate):
 ```
 
+Which stores the `start_datetime` when the model was initialized (for use in the logs).
+
 And the following methods:
 
 ```
@@ -277,6 +279,20 @@ def forward(self, input): # Returns the predicted logits
 ```
 def training_step(self, batch, batch_idx): # Returns the loss
 ```
+
+Does a training step and logs the train loss to `logs/{model_name}/{start_datetime}.log`.
+
+```
+def validation_step(self, batch, batch_idx):
+```
+
+Does a validation step and logs the validation loss and perplexity to `logs/{model_name}/{start_datetime}.log`. If the validation loss is better than the previous best, it also updates the current best model metrics (train loss, validation loss, and validation perplexity), to be saved in the checkpoint.
+
+```
+def on_save_checkpoint(self, checkpoint):
+```
+
+Saves the model's config to the current checkpoint, as well as the current epoch, step, and the current best train loss, validation loss, and perplexity.
 
 ```
 def configure_optimizers(self): # Returns the optimizer and scheduler
@@ -305,6 +321,7 @@ MAX_EPOCHS = 10
 PRECISION = 16
 MAX_DEVICES = 2
 LOG_STEPS = 50
+CHECKPOINT_SAVE_STEPS = 500
 ```
 
 The `Trainer` class manages the training of the model. It also stores the training The constructor is as follows:
@@ -322,13 +339,13 @@ If a `recent.pth` checkpoint exists for the model, training should be resumed fr
 def train(self):
 ```
 
-This trains the model using PyTorch Lightning with DDP and logs the train loss, validation loss, and validation perplexity to `logs/{model_name}/{datetime}.log`.
+This trains the model using PyTorch Lightning with DDP.
 
-The current best model (based on validation loss) is saved to `checkpoints/{model_name}/best-{datetime}.pth`, and after each epoch the model is saved to `checkpoints/{model_name}/recent.pth`.
+The PL trainer has two callbacks. The first saves the most updated version of the model to `checkpoints/{model_name}/recent.pth`. The second saves the best version of the model based on validation loss to `checkpoints/{model_name}/best-{start_datetime}.pth`. Both of these are set to `every_n_train_steps=CHECKPOINT_SAVE_STEPS`
 
 ### evaluator.py
 
-The `Evaluator` class is not yet implemented.
+The `Evaluator` class manages the evaluation of the model. It is not currently implemented.
 
 ### main.py
 
