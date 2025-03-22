@@ -23,7 +23,6 @@ def process_dataset():
     if not os.path.exists(RAW_PATH): # Save it locally first, to avoid memory issues when tokenizing
         os.makedirs(RAW_PATH, exist_ok=True)
         dataset = load_dataset(HF_PATH)
-        dataset = dataset.map(lambda x: x)
         dataset.save_to_disk(RAW_PATH)
         del dataset    
     
