@@ -48,7 +48,7 @@ def load_config(name):
 
     return config
 
-def load_model_from_config(config):
+def load_model_from_config(config, vocab_size=DEFAULT_VOCAB_SIZE):
     """
     Dynamically imports and initializes a model based on the config.
     The model type is specified in config.model.
@@ -56,6 +56,10 @@ def load_model_from_config(config):
     The class name is assumed to match the module name (normalized to remove hyphens
     and adjusted in capitalization).
     """
+    
+    if not hasattr(config, 'vocab_size'):
+        config.vocab_size = vocab_size
+    
     model_type = config.model
     model_type = model_type.strip().replace('-', '').lower()
 
