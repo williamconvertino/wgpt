@@ -2,6 +2,7 @@ torch
 torchtune
 torchao
 pytorch-lightning
+tqdm
 datasets
 tiktoken
 python-dotenv

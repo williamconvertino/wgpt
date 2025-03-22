@@ -2,6 +2,7 @@ import os
 import numpy as np
 import random
 import torch
+import tqdm
 from torch.utils.data import Dataset
 
 class DiskDataset(Dataset):
@@ -78,7 +79,9 @@ class DiskDataset(Dataset):
         token_ids = []
 
         batch = []
-        for i, sample in enumerate(data):
+        total_samples = len(data)  # Assuming data supports `len()`
+        
+        for i, sample in tqdm(enumerate(data), total=total_samples, desc=f"Tokenizing {split} data"):
             batch.append(sample)
             if len(batch) == batch_size:
                 encoded_batch = [tokenizer.encode(text, eos=use_eos) for text in batch]
