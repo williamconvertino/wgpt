@@ -24,36 +24,30 @@ class Trainer:
             model: The unwrapped model instance.
             tokenizer: The tokenizer (passed for compatibility, e.g., for further use).
         """
-        # Get dataset names from model config; expect a list, e.g., ["slim-pajama"]
+        
         datasets = model.config.get("datasets", [])
         if not datasets:
             raise ValueError("No datasets specified in model configuration.")
-        # For simplicity, use the first dataset in the list.
-        dataset_name = datasets[0]
+        
         seq_len = model.config.get("max_seq_len", 512)
         
-        # Generate splits and wrap them in the Lightning DataModule.
-        splits = DiskDataset.get_splits(dataset_name, seq_len)
-        self.dataset_wrapper = DatasetLightningWrapper(splits, batch_size=BATCH_SIZE)
+        splits = DiskDataset.get_splits(model.config.dataset, seq_len)
         
-        # Wrap the model in the LightningModule for training.
+        self.dataset_wrapper = DatasetLightningWrapper(splits, batch_size=BATCH_SIZE)
         self.model_wrapper = ModelLightningWrapper(model, learning_rate=LEARNING_RATE)
         
-        # Determine available devices (GPUs) using the helper function.
         self.device_ids = get_best_devices(model, max_gpus=MAX_DEVICES, min_vram=2.0)
         
-        # Determine if there's an existing recent checkpoint.
         model_name = self.model_wrapper.model_name
         checkpoint_dir = os.path.join("checkpoints", model_name)
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
         self.resume_ckpt = recent_ckpt_path if os.path.exists(recent_ckpt_path) else None
         
-        # Prepare checkpoint callbacks.
         self.recent_checkpoint_callback = ModelCheckpoint(
             dirpath=checkpoint_dir,
             filename="recent",
             every_n_train_steps=CHECKPOINT_SAVE_STEPS,
-            save_top_k=-1,  # Always save the most recent version.
+            save_top_k=-1,
             verbose=True,
         )
         self.best_checkpoint_callback = ModelCheckpoint(
