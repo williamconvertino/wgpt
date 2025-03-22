@@ -1,7 +1,8 @@
-import os
-from datasets import load_dataset
 import sys
+import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+import util.cache # Initializes cache in the data directory, to avoid home directory issues on cloud environments
+from datasets import load_dataset
 from data.diskdataset import DiskDataset
 from data.tokenizer import Tokenizer
 
