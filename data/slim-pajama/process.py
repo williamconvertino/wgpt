@@ -19,13 +19,13 @@ def process_dataset():
 
     if not os.path.exists('./raw'):
         os.makedirs('./raw', exist_ok=True)
-        dataset = load_dataset("DKYoon/SlimPajama-6B")
+        dataset = load_dataset("DKYoon/SlimPajama-6B", streaming=True)
         dataset.save_to_disk('/raw')
         del dataset    
 
     for split in ["train", "validation", "test"]:
             
-        dataset = load_dataset("/raw/DKYoon___slim_pajama-6_b", split=split, streaming=True)
+        dataset = load_dataset("./raw/DKYoon___slim_pajama-6_b", split=split, streaming=True)
         
         DiskDataset.generate_bin("slim-pajama", split, dataset['text'], tokenizer)
 
