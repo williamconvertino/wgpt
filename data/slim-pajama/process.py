@@ -1,7 +1,9 @@
 import os
 from datasets import load_dataset
-from ..diskdataset import DiskDataset
-from ..tokenizer import Tokenizer
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+from data.diskdataset import DiskDataset
+from data.tokenizer import Tokenizer
 
 def process_dataset():
     """
