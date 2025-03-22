@@ -22,9 +22,10 @@ def dict_to_namespace(d):
 
 def merge_configs(config, default):
     result = deepcopy(default)
-    for key, value in config.items():
-        if isinstance(value, dict):
-            result[key] = merge_configs(value, result.get(key, {}))
+    for key in config.__dict__:
+        value = getattr(config, key)
+        if isinstance(value, SimpleNamespace):
+            result[key] = merge_configs(value, result.get(key, SimpleNamespace()))
         else:
             result[key] = value
     return result
