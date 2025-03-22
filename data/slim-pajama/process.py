@@ -20,7 +20,7 @@ def process_dataset():
         
         dataset = load_dataset("DKYoon/SlimPajama-6B", split=split, cache_dir="./raw")
         
-        DiskDataset.generate_bin("slim-pajama", split, dataset[split], tokenizer)
+        DiskDataset.generate_bin("slim-pajama", split, dataset['text'], tokenizer)
 
 if __name__ == "__main__":
     process_dataset()
