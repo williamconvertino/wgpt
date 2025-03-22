@@ -26,7 +26,7 @@ def process_dataset():
         dataset.save_to_disk(RAW_PATH)
         del dataset    
     
-    dataset = load_dataset(RAW_PATH, streaming=True)
+    dataset = load_dataset(RAW_PATH)
         
     for split in ["train", "validation", "test"]:
             
