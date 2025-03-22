@@ -17,8 +17,8 @@ def process_dataset():
     
     tokenizer = Tokenizer()
 
-    if not os.path.exists('/raw'):
-        os.makedirs('/raw', exist_ok=True)
+    if not os.path.exists('./raw'):
+        os.makedirs('./raw', exist_ok=True)
         dataset = load_dataset("DKYoon/SlimPajama-6B")
         dataset.save_to_disk('/raw')
         del dataset    
