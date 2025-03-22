@@ -20,8 +20,7 @@ def process_dataset():
     tokenizer = Tokenizer()
     
     download_config = DownloadConfig(
-        max_retries=10,
-        retry_wait=10,
+        max_retries=20,
         cache_dir="./hf_cache"
     )
     
