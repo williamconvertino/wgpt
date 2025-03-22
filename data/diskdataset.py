@@ -2,7 +2,7 @@ import os
 import numpy as np
 import random
 import torch
-import tqdm
+from tqdm import tqdm
 from torch.utils.data import Dataset
 
 class DiskDataset(Dataset):
