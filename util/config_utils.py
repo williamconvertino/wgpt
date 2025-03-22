@@ -3,6 +3,7 @@ import yaml
 import importlib
 from types import SimpleNamespace
 from data.tokenizer import Tokenizer
+from copy import deepcopy
 
 BASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'configs')
 DEFAULT_PATH = os.path.join(BASE_PATH, 'default.yml')
@@ -20,7 +21,7 @@ def dict_to_namespace(d):
     return d
 
 def merge_configs(config, default):
-    result = default.copy()
+    result = deepcopy(default)
     for key, value in config.items():
         if isinstance(value, dict):
             result[key] = merge_configs(value, result.get(key, {}))
