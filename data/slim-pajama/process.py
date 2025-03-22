@@ -1,7 +1,7 @@
 import os
 from datasets import load_dataset
-from data.diskdataset import DiskDataset
-from data.tokenizer import Tokenizer
+from ..diskdataset import DiskDataset
+from ..tokenizer import Tokenizer
 
 def process_dataset():
     """
