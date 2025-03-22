@@ -1,3 +1,5 @@
+import util.cache # Initializes cache in the data directory, to avoid home directory issues on cloud environments
+
 import argparse
 from util.config_utils import load_config, load_model_from_config
 from data.tokenizer import Tokenizer
