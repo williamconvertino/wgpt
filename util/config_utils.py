@@ -25,9 +25,10 @@ def merge_configs(config, default):
     for key in config.__dict__:
         value = getattr(config, key)
         if isinstance(value, SimpleNamespace):
-            result[key] = merge_configs(value, getattr(result, key, SimpleNamespace()))
+            setattr(result, key, merge_configs(value, getattr(default, key)))
         else:
-            result[key] = value
+            setattr(result, key, value)
+            
     return result
 
 def load_config(name):
