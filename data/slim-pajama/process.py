@@ -26,7 +26,7 @@ def process_dataset():
                 if text:
                     yield text
         
-        DiskDataset.generate_bin("slim-pajama", split, text_generator, tokenizer, total_samples=total_samples)
+        DiskDataset.generate_bin("slim-pajama", split, text_generator(), tokenizer, total_samples=total_samples)
 
 if __name__ == "__main__":
     process_dataset()
