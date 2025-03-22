@@ -26,12 +26,12 @@ def process_dataset():
         dataset = dataset.map(lambda x: x)
         dataset.save_to_disk(RAW_PATH)
         del dataset    
-
+    
+    dataset = load_dataset(RAW_PATH, streaming=True)
+        
     for split in ["train", "validation", "test"]:
             
-        dataset = load_dataset(RAW_PATH, split=split, streaming=True)
-        
-        DiskDataset.generate_bin("slim-pajama", split, dataset['text'], tokenizer)
+        DiskDataset.generate_bin("slim-pajama", split, dataset[split]['text'], tokenizer)
 
 if __name__ == "__main__":
     process_dataset()
