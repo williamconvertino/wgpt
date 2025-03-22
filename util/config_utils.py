@@ -3,7 +3,7 @@ import yaml
 import importlib
 
 BASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'configs')
-DEFAULTS_PATH = os.path.join(BASE_PATH, 'defaults.yml')
+DEFAULT_PATH = os.path.join(BASE_PATH, 'default.yml')
 
 def merge_dicts(main_dict, default_dict):
     result = default_dict.copy()
@@ -17,17 +17,17 @@ def merge_dicts(main_dict, default_dict):
 def load_config(name):
     """
     Loads a config file from 'configs/{name}.yml', fills in missing values 
-    from 'configs/defaults.yml', and returns the merged configuration as a dict.
+    from 'configs/default.yml', and returns the merged configuration as a dict.
     """
     config_path = os.path.join(BASE_PATH, f"{name}.yml")
     
-    with open(DEFAULTS_PATH, 'r') as f:
-        defaults = yaml.safe_load(f)
+    with open(DEFAULT_PATH, 'r') as f:
+        default = yaml.safe_load(f)
 
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    return merge_dicts(config, defaults)
+    return merge_dicts(config, default)
 
 def load_model_from_config(config):
     """
