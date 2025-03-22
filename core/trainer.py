@@ -25,11 +25,7 @@ class Trainer:
             tokenizer: The tokenizer (passed for compatibility, e.g., for further use).
         """
         
-        datasets = model.config.get("datasets", [])
-        if not datasets:
-            raise ValueError("No datasets specified in model configuration.")
-        
-        seq_len = model.config.get("max_seq_len", 512)
+        seq_len = model.config.max_seq_len
         
         splits = DiskDataset.get_splits(model.config.dataset, seq_len)
         

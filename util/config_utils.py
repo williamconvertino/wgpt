@@ -25,12 +25,12 @@ def merge_configs(config, default):
     for key in config.__dict__:
         value = getattr(config, key)
         if isinstance(value, SimpleNamespace):
-            result[key] = merge_configs(value, result.get(key, SimpleNamespace()))
+            result[key] = merge_configs(value, getattr(result, key, SimpleNamespace()))
         else:
             result[key] = value
     return result
 
-def load_config(name, vocab_size=DEFAULT_VOCAB_SIZE):
+def load_config(name):
     """
     Loads a config file from 'configs/{name}.yml', fills in missing values 
     from 'configs/default.yml', and returns the merged configuration as a SimpleNamespace object.
@@ -44,22 +44,18 @@ def load_config(name, vocab_size=DEFAULT_VOCAB_SIZE):
         config = dict_to_namespace(yaml.safe_load(f))
         
     config = merge_configs(config, default)
-    config.model['vocab_size'] = vocab_size
 
     return config
 
 def load_model_from_config(config):
     """
     Dynamically imports and initializes a model based on the config.
-    The model type is specified in config.model.type.
+    The model type is specified in config.model.
     The corresponding module is expected to be in the 'models' folder.
     The class name is assumed to match the module name (normalized to remove hyphens
     and adjusted in capitalization).
     """
-    model_type = getattr(config.model, 'type', None)
-    if not model_type:
-        raise ValueError("Config must specify a model type in 'model.type'.")
-    
+    model_type = config.model
     model_type = model_type.strip().replace('-', '').lower()
 
     try:
@@ -77,6 +73,6 @@ def load_model_from_config(config):
     if model_class is None:
         raise AttributeError(f"Could not find model class in module '{model_type}'.")    
 
-    model = model_class(config.model)
+    model = model_class(config)
     model.config = config
     return model

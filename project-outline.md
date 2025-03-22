@@ -93,7 +93,7 @@ Takes in the name of a config file, loads the corresponding `.yml` file, convert
 def load_model_from_config(config): # Returns an initialized model
 ```
 
-Takes in a config object, initializes the corresponding model with the config, sets `model.config` to the given config, and returns the model. It should find the model class automatically from within `models/` using `importlib` (the `config.model.type` field should match the filename and the class name, when all are converted to lowercase and hyphens are removed).
+Takes in a config object, initializes the corresponding model with the config, sets `model.config` to the given config, and returns the model. It should find the model class automatically from within `models/` using `importlib` (the `config.model` field should match the filename and the class name, when all are converted to lowercase and hyphens are removed).
 
 ### models/
 

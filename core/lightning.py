@@ -18,9 +18,9 @@ class DatasetLightningWrapper(pl.LightningDataModule):
         self.num_workers = num_workers
 
     def setup(self, stage=None):
-        self.train_dataset = self.splits.get("train")
-        self.val_dataset = self.splits.get("validation")
-        self.test_dataset = self.splits.get("test")
+        self.train_dataset = self.splits["train"]
+        self.val_dataset = self.splits["validation"]
+        self.test_dataset = self.splits["test"]
 
     def train_dataloader(self):
         return DataLoader(
