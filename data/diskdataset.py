@@ -42,7 +42,7 @@ class DiskDataset(Dataset):
         for split in dataset_dict.keys():
             
             dataset = dataset_dict[split]
-            dataset = dataset.map(lambda x: tokenizer.encode(x["text"], eos=use_eos), batched=True)
+            dataset = dataset.map(lambda x: { 'input_ids': tokenizer.encode(x["text"], eos=use_eos)}, batched=True, remove_columns=["text"])
             
             file_size = sum(len(sample) for sample in dataset)
             
