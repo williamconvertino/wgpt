@@ -44,7 +44,7 @@ class DiskDataset(Dataset):
             dataset = dataset_dict[split]
             dataset = dataset.map(lambda x: { 'input_ids': tokenizer.encode(x["text"], eos=use_eos)}, batched=True, remove_columns=["text"])
             
-            file_size = sum(len(sample) for sample in dataset)
+            file_size = sum(len(sample) for sample in dataset['input_ids'])
             
             file_dir = os.path.join(os.path.dirname(__file__), dataset_name, "tokenized")
             file_path = os.path.join(file_dir, f"{split}.bin")
