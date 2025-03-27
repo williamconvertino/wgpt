@@ -49,6 +49,10 @@ class DiskDataset(Dataset):
             file_dir = os.path.join(os.path.dirname(__file__), dataset_name, "tokenized")
             file_path = os.path.join(file_dir, f"{split}.bin")
             
+            if os.path.exists(file_path):
+                print(f"Dataset file {file_path} already exists, skipping")
+                continue
+            
             os.makedirs(file_dir, exist_ok=True)
             
             memmap_array = np.memmap(file_path, dtype="int32", mode="w+", shape=(file_size,))
