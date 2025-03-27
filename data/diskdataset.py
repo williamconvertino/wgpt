@@ -49,7 +49,7 @@ class DiskDataset(Dataset):
             file_dir = os.path.join(os.path.dirname(__file__), dataset_name, "tokenized")
             file_path = os.path.join(file_dir, f"{split}.bin")
             
-            os.makedirs(file_path, exist_ok=True)
+            os.makedirs(file_dir, exist_ok=True)
             
             memmap_array = np.memmap(file_path, dtype="int32", mode="w+", shape=(file_size,))
             
