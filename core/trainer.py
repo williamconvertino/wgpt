@@ -34,7 +34,7 @@ class Trainer:
         
         self.device_ids = get_best_devices(model, max_gpus=MAX_DEVICES, min_vram=2.0)
         
-        model_name = self.model_wrapper.model.config.model_name
+        model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
         self.resume_ckpt = recent_ckpt_path if os.path.exists(recent_ckpt_path) else None
