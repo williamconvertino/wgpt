@@ -71,4 +71,4 @@ class Trainer:
             log_every_n_steps=LOG_STEPS
         )
         
-        pl_trainer.fit(self.model_wrapper, datamodule=self.dataset_wrapper, resume_from_checkpoint=self.resume_ckpt)
+        pl_trainer.fit(self.model_wrapper, datamodule=self.dataset_wrapper, ckpt_path=self.resume_ckpt)
