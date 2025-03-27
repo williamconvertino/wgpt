@@ -66,7 +66,7 @@ class ModelLightningWrapper(pl.LightningModule):
         self.learning_rate = learning_rate
         self.start_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         
-        self.log_dir = os.path.join("logs", self.model.name)
+        self.log_dir = os.path.join("logs", self.model.config.name)
         os.makedirs(self.log_dir, exist_ok=True)
         self.log_file = os.path.join(self.log_dir, f"{self.start_datetime}.log")
         
