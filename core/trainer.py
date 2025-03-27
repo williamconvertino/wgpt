@@ -24,6 +24,8 @@ class Trainer:
         
         self.device_ids = get_best_devices(model, max_gpus=max_gpus, min_vram=2.0)
         
+        assert len(self.device_ids) > 0, "No GPUs available with at least 2GB of free VRAM."
+        
         model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
