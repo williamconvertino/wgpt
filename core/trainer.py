@@ -26,6 +26,8 @@ class Trainer:
         
         assert len(self.device_ids) > 0, "No GPUs available with at least 2GB of free VRAM."
         
+        print(self.device_ids)
+        
         model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
