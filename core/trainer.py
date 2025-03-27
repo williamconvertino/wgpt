@@ -10,12 +10,11 @@ BATCH_SIZE = 64
 LEARNING_RATE = 5e-5
 MAX_EPOCHS = 10
 PRECISION = "16-mixed"
-MAX_DEVICES = 2
 LOG_STEPS = 50
 CHECKPOINT_SAVE_PCT = 0.05
 
 class Trainer:
-    def __init__(self, model, tokenizer):
+    def __init__(self, model, tokenizer, max_gpus=2):
         seq_len = model.config.max_seq_len
         
         splits = DiskDataset.get_splits(model.config.dataset, seq_len)
@@ -23,7 +22,7 @@ class Trainer:
         self.dataset_wrapper = DatasetLightningWrapper(splits, batch_size=BATCH_SIZE)
         self.model_wrapper = ModelLightningWrapper(model, learning_rate=LEARNING_RATE)
         
-        self.device_ids = get_best_devices(model, max_gpus=MAX_DEVICES, min_vram=2.0)
+        self.device_ids = get_best_devices(model, max_gpus=max_gpus, min_vram=2.0)
         
         model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)

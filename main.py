@@ -12,6 +12,7 @@ def main():
     
     group.add_argument("--train", type=str, help="Start training using the specified config name (e.g., gpt2)")
     group.add_argument("--eval", type=str, help="Evaluate using the specified config name (e.g., gpt2)")
+    group.add_argument("--gpus", type=int, help="Number of GPUs to use for training", default=2)
     args = parser.parse_args()
 
     config = load_config(args.train if args.train else args.eval)
