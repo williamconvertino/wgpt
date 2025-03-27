@@ -71,7 +71,6 @@ class DiskDataset(Dataset):
                 buffer = []
                 
             memmap_array.flush()
-            return memmap_array
     
     @staticmethod
     def get_splits(dataset_name, seq_len):
