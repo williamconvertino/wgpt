@@ -134,8 +134,8 @@ class FGModel(nn.Module):
 
         x = self.embedding(x)
         
-        for transformer_block in self.transformer_blocks:
-            f, g = transformer_block(x, x)
+        for fg_block in self.fg_blocks:
+            f, g = fg_block(x, x)
         
         x = self.transformer_block(f)
         
