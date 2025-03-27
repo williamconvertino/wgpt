@@ -68,8 +68,7 @@ class Trainer:
             devices=self.device_ids if self.device_ids else None,
             strategy="ddp" if self.device_ids and len(self.device_ids) > 1 else None,
             callbacks=[self.recent_checkpoint_callback, self.best_checkpoint_callback],
-            log_every_n_steps=LOG_STEPS,
-            resume_from_checkpoint=self.resume_ckpt,
+            log_every_n_steps=LOG_STEPS
         )
         
-        pl_trainer.fit(self.model_wrapper, datamodule=self.dataset_wrapper)
+        pl_trainer.fit(self.model_wrapper, datamodule=self.dataset_wrapper, resume_from_checkpoint=self.resume_ckpt)
