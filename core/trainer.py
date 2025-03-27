@@ -26,7 +26,7 @@ class Trainer:
         
         assert len(self.device_ids) > 0, "No GPUs available with at least 2GB of free VRAM."
         
-        print(self.device_ids)
+        print(self.device_ids, "single_device" if len(self.device_ids) == 1 else "ddp")
         
         model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)
