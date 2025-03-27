@@ -26,8 +26,6 @@ class Trainer:
         
         assert len(self.device_ids) > 0, "No GPUs available with at least 2GB of free VRAM."
         
-        print(self.device_ids, "single_device" if len(self.device_ids) == 1 else "ddp")
-        
         model_name = self.model_wrapper.name
         checkpoint_dir = os.path.join("checkpoints", model_name)
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
@@ -56,8 +54,8 @@ class Trainer:
         pl_trainer = pl.Trainer(
             max_epochs=MAX_EPOCHS,
             precision=PRECISION,
-            accelerator="gpu" if self.device_ids else "cpu",
-            devices=self.device_ids if self.device_ids else None,
+            accelerator="gpu",
+            devices=1 if len(self.device_ids) == 1 else self.device_ids,
             strategy="single_device" if len(self.device_ids) == 1 else "ddp",
             callbacks=[self.recent_checkpoint_callback, self.best_checkpoint_callback],
             log_every_n_steps=LOG_STEPS
