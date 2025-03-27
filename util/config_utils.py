@@ -61,7 +61,6 @@ def load_model_from_config(config, vocab_size=DEFAULT_VOCAB_SIZE):
         config.vocab_size = vocab_size
     
     model_type = config.model
-    model_type = model_type.strip().replace('-', '').lower()
 
     try:
         module = importlib.import_module(f"models.{model_type}")
@@ -71,7 +70,7 @@ def load_model_from_config(config, vocab_size=DEFAULT_VOCAB_SIZE):
     model_class = None
 
     for attr in dir(module):
-        if attr.lower() == model_type:
+        if attr.lower().replace('_', '') == model_type.lower().replace('_', ''):
             model_class = getattr(module, attr)
             break
     
