@@ -76,8 +76,8 @@ class FGBlock(nn.Module):
         
         self.attention = Attention(config)
         self.feed_forward = FeedForward(config)
-        self.ln_1 = nn.LayerNorm(config.d_embed)
-        self.ln_2 = nn.LayerNorm(config.d_embed)
+        self.ln_1 = nn.LayerNorm(config.d_embed // 2)
+        self.ln_2 = nn.LayerNorm(config.d_embed // 2)
         
     def forward(self, f, g):
         f = f + self.attention(self.ln_1(g))
@@ -90,8 +90,9 @@ class TransformerBlock(nn.Module):
         
         self.attention = Attention(config)
         self.feed_forward = FeedForward(config)
-        self.ln_1 = nn.LayerNorm(config.d_embed)
-        self.ln_2 = nn.LayerNorm(config.d_embed)
+        self.ln_1 = nn.LayerNorm(config.d_embed // 2)
+        self.ln_2 = nn.LayerNorm(config.d_embed // 2)
+        
         
     def forward(self, x):
         x = x + self.attention(self.ln_1(x))
