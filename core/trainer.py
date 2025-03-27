@@ -9,7 +9,7 @@ from util.gpu_utils import get_best_devices
 BATCH_SIZE = 64
 LEARNING_RATE = 5e-5
 MAX_EPOCHS = 10
-PRECISION = 16
+PRECISION = "16-mixed"
 MAX_DEVICES = 2
 LOG_STEPS = 50
 CHECKPOINT_SAVE_STEPS = 500

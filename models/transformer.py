@@ -113,7 +113,7 @@ class Transformer(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
         
-    def forward(self, x, targets=None, ignore_index=-1):
+    def forward(self, x):
         
         B, S = x.shape
 
@@ -124,10 +124,4 @@ class Transformer(nn.Module):
         
         x = self.ln_f(x)
         
-        logits = self.lm_head(x)
-        
-        if targets is None:
-            return logits, None
-    
-        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=ignore_index)
-        return logits, loss
+        return self.lm_head(x)
