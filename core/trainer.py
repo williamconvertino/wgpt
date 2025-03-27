@@ -55,8 +55,8 @@ class Trainer:
             max_epochs=MAX_EPOCHS,
             precision=PRECISION,
             accelerator="gpu",
-            devices=1 if len(self.device_ids) == 1 else self.device_ids,
-            strategy="single_device" if len(self.device_ids) == 1 else "ddp",
+            devices=self.device_ids,
+            strategy="auto" if len(self.device_ids) == 1 else "ddp",
             callbacks=[self.recent_checkpoint_callback, self.best_checkpoint_callback],
             log_every_n_steps=LOG_STEPS
         )
