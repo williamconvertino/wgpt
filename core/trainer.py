@@ -12,19 +12,10 @@ MAX_EPOCHS = 10
 PRECISION = "16-mixed"
 MAX_DEVICES = 2
 LOG_STEPS = 50
-CHECKPOINT_SAVE_STEPS = 500
+CHECKPOINT_SAVE_PCT = 0.05
 
 class Trainer:
     def __init__(self, model, tokenizer):
-        """
-        Initializes training by generating splits, wrapping the model,
-        selecting devices, and preparing checkpoint callbacks.
-        
-        Args:
-            model: The unwrapped model instance.
-            tokenizer: The tokenizer (passed for compatibility, e.g., for further use).
-        """
-        
         seq_len = model.config.max_seq_len
         
         splits = DiskDataset.get_splits(model.config.dataset, seq_len)
@@ -39,10 +30,12 @@ class Trainer:
         recent_ckpt_path = os.path.join(checkpoint_dir, "recent.pth")
         self.resume_ckpt = recent_ckpt_path if os.path.exists(recent_ckpt_path) else None
         
+        self.checpoint_save_steps = int(len(splits["train"]) * CHECKPOINT_SAVE_PCT)
+        
         self.recent_checkpoint_callback = ModelCheckpoint(
             dirpath=checkpoint_dir,
             filename="recent",
-            every_n_train_steps=CHECKPOINT_SAVE_STEPS,
+            every_n_train_steps=self.checpoint_save_steps,
             save_top_k=-1,
             verbose=True,
         )
@@ -51,16 +44,12 @@ class Trainer:
             filename=f"best-{self.model_wrapper.start_datetime}",
             monitor="val_loss",
             mode="min",
-            every_n_train_steps=CHECKPOINT_SAVE_STEPS,
+            every_n_train_steps=self.checpoint_save_steps,
             save_top_k=1,
             verbose=True,
         )
     
     def train(self):
-        """
-        Trains the model using PyTorch Lightning with DDP (if multiple GPUs are available)
-        and resumes from a checkpoint if one exists.
-        """
         pl_trainer = pl.Trainer(
             max_epochs=MAX_EPOCHS,
             precision=PRECISION,

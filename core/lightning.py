@@ -6,12 +6,6 @@ from torch.utils.data import DataLoader
 
 class DatasetLightningWrapper(pl.LightningDataModule):
     def __init__(self, splits, batch_size=32, num_workers=4):
-        """
-        Args:
-            splits (dict): A dictionary with keys 'train', 'validation', and 'test' mapping to DiskDataset instances.
-            batch_size (int): Batch size to use in data loaders.
-            num_workers (int): Number of workers for data loading.
-        """
         super().__init__()
         self.splits = splits
         self.batch_size = batch_size
@@ -45,22 +39,12 @@ class DatasetLightningWrapper(pl.LightningDataModule):
         )
 
     def on_train_epoch_start(self):
-        """
-        At the start of each training epoch, shuffle the train dataset indices using the current epoch as seed.
-        """
         epoch_seed = self.trainer.current_epoch
         if hasattr(self.train_dataset, "shuffle_indices"):
             self.train_dataset.shuffle_indices(seed=epoch_seed)
 
 class ModelLightningWrapper(pl.LightningModule):
     def __init__(self, model, learning_rate):
-        """
-        Wraps a model to integrate with PyTorch Lightning.
-
-        Args:
-            model: The underlying model instance.
-            learning_rate (float): Learning rate for optimization.
-        """
         super().__init__()
         self.model = model
         self.learning_rate = learning_rate
@@ -77,23 +61,15 @@ class ModelLightningWrapper(pl.LightningModule):
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
     def forward(self, x):
-        """
-        Returns:
-            The predicted logits from the underlying model.
-        """
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        """
-        Performs a training step and logs the train loss.
-        Assumes that batch is a tensor of token IDs of shape [B, seq_len].
-        """
         logits = self.forward(batch)
         
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
         loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1))
-        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log("train_loss", loss, on_step=True, prog_bar=True, on_epoch=True, sync_dist=True)
         
         with open(self.log_file, "a") as f:
             f.write(f"Epoch {self.current_epoch}, Batch {batch_idx}, Train Loss: {loss.item()}\n")
@@ -101,18 +77,14 @@ class ModelLightningWrapper(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        """
-        Performs a validation step, logs the validation loss and perplexity,
-        and updates the best metrics if the validation loss improves.
-        """
         logits = self.forward(batch)
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
         loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1))
         
         ppl = torch.exp(loss)
-        self.log("val_loss", loss, prog_bar=True)
-        self.log("val_ppl", ppl, prog_bar=True)
+        self.log("val_loss", loss, prog_bar=True, on_epoch=True, sync_dist=True)
+        self.log("val_ppl", ppl, prog_bar=True, on_epoch=True, sync_dist=True)
         
         with open(self.log_file, "a") as f:
             f.write(f"Epoch {self.current_epoch}, Batch {batch_idx}, Val Loss: {loss.item()}, Val PPL: {ppl.item()}\n")
@@ -125,9 +97,6 @@ class ModelLightningWrapper(pl.LightningModule):
         return loss
 
     def on_save_checkpoint(self, checkpoint):
-        """
-        Saves the model's config, current epoch, global step, and best metrics into the checkpoint.
-        """
         checkpoint["config"] = self.model.config
         checkpoint["epoch"] = self.current_epoch
         checkpoint["global_step"] = self.global_step
@@ -136,9 +105,6 @@ class ModelLightningWrapper(pl.LightningModule):
         checkpoint["best_val_ppl"] = self.best_val_ppl
 
     def configure_optimizers(self):
-        """
-        Configures the AdamW optimizer and a OneCycleLR scheduler.
-        """
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
         total_steps = self.trainer.estimated_stepping_batches
         
