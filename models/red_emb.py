@@ -10,10 +10,10 @@ class Attention(nn.Module):
         
         self.config = config
         
-        self.W_q = nn.Linear(config.d_embed  // 2, config.n_heads * config.d_embed, bias=False)
-        self.W_k = nn.Linear(config.d_embed  // 2, config.n_heads * config.d_embed, bias=False)
-        self.W_v = nn.Linear(config.d_embed  // 2, config.n_heads * config.d_embed, bias=False)
-        self.W_o = nn.Linear(config.n_heads * config.d_embed, config.d_embed // 2, bias=False)
+        self.W_q = nn.Linear(config.d_embed, config.n_heads * config.d_embed, bias=False)
+        self.W_k = nn.Linear(config.d_embed, config.n_heads * config.d_embed, bias=False)
+        self.W_v = nn.Linear(config.d_embed, config.n_heads * config.d_embed, bias=False)
+        self.W_o = nn.Linear(config.n_heads * config.d_embed, config.d_embed, bias=False)
         
         self.attn_scale = 1 / math.sqrt(config.d_embed)
         
@@ -57,8 +57,8 @@ class FeedForward(nn.Module):
     def __init__(self, config):
         super().__init__()
 
-        self.fc_1 = nn.Linear(config.d_embed // 2, 4 * config.d_embed)
-        self.fc_2 = nn.Linear(4 * config.d_embed, config.d_embed // 2)
+        self.fc_1 = nn.Linear(config.d_embed, 4 * config.d_embed)
+        self.fc_2 = nn.Linear(4 * config.d_embed, config.d_embed)
         
         self.activation = nn.GELU()    
         self.drop = nn.Dropout(0.1)
@@ -69,20 +69,6 @@ class FeedForward(nn.Module):
         x = self.drop(x)
         x = self.fc_2(x)
         return x
-
-class FGBlock(nn.Module):
-    def __init__(self, config):
-        super().__init__()
-        
-        self.attention = Attention(config)
-        self.feed_forward = FeedForward(config)
-        self.ln_1 = nn.LayerNorm(config.d_embed)
-        self.ln_2 = nn.LayerNorm(config.d_embed)
-        
-    def forward(self, f, g):
-        f = f + self.attention(self.ln_1(g))
-        g = g + self.feed_forward(self.ln_2(f))
-        return f, g
 
 class TransformerBlock(nn.Module):
     def __init__(self, config):
@@ -97,8 +83,8 @@ class TransformerBlock(nn.Module):
         x = x + self.attention(self.ln_1(x))
         x = x + self.feed_forward(self.ln_2(x))
         return x
-    
-class FGModel(nn.Module):
+
+class RedEmb(nn.Module):
     def __init__(self, config):
         super().__init__()
         
@@ -106,8 +92,7 @@ class FGModel(nn.Module):
         
         self.embedding = nn.Embedding(config.vocab_size, config.d_embed // 2)
 
-        self.fg_blocks = nn.ModuleList([FGBlock(config) for _ in range(config.n_layers - 1)])
-        self.transformer_block = TransformerBlock(config)
+        self.transformer_blocks = nn.ModuleList([TransformerBlock(config) for _ in range(config.n_layers)])
         
         self.ln_f = nn.LayerNorm(config.d_embed // 2)
 
@@ -133,11 +118,12 @@ class FGModel(nn.Module):
         B, S = x.shape
 
         x = self.embedding(x)
+        x = torch.cat([x, torch.zeros(B, S, self.config.d_embed // 2).to(x.device)], dim=-1)
         
         for transformer_block in self.transformer_blocks:
-            f, g = transformer_block(x, x)
+            x = transformer_block(x)
         
-        x = self.transformer_block(f)
+        x = x[:, :, :self.config.d_embed // 2]
         
         x = self.ln_f(x)
         

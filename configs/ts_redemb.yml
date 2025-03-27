@@ -1,0 +1,9 @@
+{
+  "name": "ts_red_emb",
+  "model": "red_emb",
+  "d_embed": 512,
+  "n_layers": 3,
+  "n_heads": 8,
+  "max_seq_len": 128,
+  "dataset": "tiny-stories",
+}
