@@ -54,7 +54,7 @@ class Trainer:
             precision=PRECISION,
             accelerator="gpu" if self.device_ids else "cpu",
             devices=self.device_ids if self.device_ids else None,
-            strategy="default" if len(self.device_ids) == 1 else "ddp",
+            strategy="single_device" if len(self.device_ids) == 1 else "ddp",
             callbacks=[self.recent_checkpoint_callback, self.best_checkpoint_callback],
             log_every_n_steps=LOG_STEPS
         )
