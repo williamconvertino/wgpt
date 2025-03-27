@@ -6,7 +6,7 @@ from data.diskdataset import DiskDataset
 from util.gpu_utils import get_best_devices
 
 # Training Constants
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 LEARNING_RATE = 5e-5
 MAX_EPOCHS = 10
 PRECISION = "16-mixed"
@@ -54,7 +54,7 @@ class Trainer:
             precision=PRECISION,
             accelerator="gpu" if self.device_ids else "cpu",
             devices=self.device_ids if self.device_ids else None,
-            strategy="ddp" if self.device_ids and len(self.device_ids) > 1 else "auto",
+            strategy="default" if len(self.device_ids) == 1 else "ddp",
             callbacks=[self.recent_checkpoint_callback, self.best_checkpoint_callback],
             log_every_n_steps=LOG_STEPS
         )
