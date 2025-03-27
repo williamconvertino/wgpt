@@ -53,6 +53,8 @@ class DiskDataset(Dataset):
             
             memmap_array = np.memmap(file_path, dtype="int32", mode="w+", shape=(file_size,))
             
+            print(f"Generating {dataset_name}, {split} split")
+            
             buffer = []
             write_pointer = 0
             
