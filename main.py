@@ -18,7 +18,7 @@ def main():
 
     if args.train:
         tokenizer = Tokenizer()
-        trainer = Trainer(model, tokenizer)
+        trainer = Trainer(model, tokenizer, max_gpus=args.gpus)
         trainer.train()
     elif args.eval:
         print("Evaluation is not implemented yet.")
