@@ -2,7 +2,7 @@
   "name": "transformer",
   "model": "transformer",
   "d_embed": 756,
-  "n_layers": 12,
+  "n_layers": 6,
   "n_heads": 12,
   "max_seq_len": 1024,
 }
