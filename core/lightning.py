@@ -3,6 +3,7 @@ import datetime
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
+from torch.nn import functional as F
 
 class DatasetLightningWrapper(pl.LightningDataModule):
     def __init__(self, splits, batch_size=32, num_workers=4):
@@ -59,8 +60,6 @@ class ModelLightningWrapper(pl.LightningModule):
         self.best_val_loss = None
         self.best_val_ppl = None
         
-        self.loss_fn = torch.nn.CrossEntropyLoss()
-
     def forward(self, x):
         return self.model(x)
 
@@ -69,7 +68,7 @@ class ModelLightningWrapper(pl.LightningModule):
         
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
-        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
+        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
         self.log("train_loss", loss, on_step=True, prog_bar=True, on_epoch=True, sync_dist=True)
         
         with open(self.log_file, "a") as f:
@@ -81,7 +80,7 @@ class ModelLightningWrapper(pl.LightningModule):
         logits = self.forward(batch)
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
-        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
+        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
         
         ppl = torch.exp(loss)
         self.log("val_loss", loss, prog_bar=True, on_epoch=True, sync_dist=True)
