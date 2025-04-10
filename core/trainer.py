@@ -14,13 +14,13 @@ LOG_STEPS = 50
 CHECKPOINT_SAVE_PCT = 0.05
 
 class Trainer:
-    def __init__(self, model, tokenizer, max_gpus=2):
+    def __init__(self, model, tokenizer, max_gpus=4):
         seq_len = model.config.max_seq_len
         
         splits = DiskDataset.get_splits(model.config.dataset, seq_len)
         
         self.dataset_wrapper = DatasetLightningWrapper(splits, batch_size=BATCH_SIZE)
-        self.model_wrapper = ModelLightningWrapper(model, learning_rate=LEARNING_RATE)
+        self.model_wrapper = ModelLightningWrapper(model, tokenizer, learning_rate=LEARNING_RATE)
         
         self.device_ids = get_best_devices(model, max_gpus=max_gpus, min_vram=2.0)
         

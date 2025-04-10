@@ -44,9 +44,10 @@ class DatasetLightningWrapper(pl.LightningDataModule):
             self.train_dataset.shuffle_indices(seed=epoch_seed)
 
 class ModelLightningWrapper(pl.LightningModule):
-    def __init__(self, model, learning_rate):
+    def __init__(self, model, tokenizer, learning_rate):
         super().__init__()
         self.model = model
+        self.tokenizer = tokenizer
         self.learning_rate = learning_rate
         self.start_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         self.name = self.model.config.name
@@ -68,7 +69,7 @@ class ModelLightningWrapper(pl.LightningModule):
         
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
-        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1))
+        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
         self.log("train_loss", loss, on_step=True, prog_bar=True, on_epoch=True, sync_dist=True)
         
         with open(self.log_file, "a") as f:
@@ -80,7 +81,7 @@ class ModelLightningWrapper(pl.LightningModule):
         logits = self.forward(batch)
         targets = batch[:, 1:].contiguous()
         logits = logits[:, :-1, :].contiguous()
-        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1))
+        loss = self.loss_fn(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=self.tokenizer.pad_token_id)
         
         ppl = torch.exp(loss)
         self.log("val_loss", loss, prog_bar=True, on_epoch=True, sync_dist=True)
